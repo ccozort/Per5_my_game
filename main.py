@@ -4,6 +4,7 @@
 import pygame as pg
 from settings import *
 from sprites import *
+# we are editing this file after installing git
 
 # create a game class that carries all the properties of the game and methods
 class Game:
