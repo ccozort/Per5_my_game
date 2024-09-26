@@ -29,6 +29,7 @@ class Game:
     for i in range(6):
       w = Wall(self, TILESIZE*i, TILESIZE*i)
       print(w.rect.x)
+      m = Mob(self, TILESIZE*i, TILESIZE*i)
 
 # this is a method
 # methods are like functions that are part of a class
