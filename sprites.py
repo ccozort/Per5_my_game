@@ -17,22 +17,42 @@ class Player(Sprite):
         self.rect.x = x
         self.rect.y = y
         self.speed = 10
+        self.vx, self.vy = 0, 0
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.rect.y -= self.speed
+            self.vx -= self.speed
         if keys[pg.K_a]:
-            self.rect.x -= self.speed
+            self.vx -= self.speed
         if keys[pg.K_s]:
-            self.rect.y += self.speed
+            self.vy += self.speed
         if keys[pg.K_d]:
-            self.rect.x += self.speed
+            self.vy += self.speed
     def collide_with_walls(self, dir):
-        print(dir)
+        if dir == 'x':
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            if hits:
+                if self.vx > 0:
+                    self.x = hits[0].rect.left
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
+                print("this works!!!")
+            else:
+                print("not working...for hits")
+        else:
+            print("not working for dir check")
     def update(self):
         self.get_keys()
-        # hits = pg.sprite.spritecollide(self, self.game.all_walls)
-        # self.collide_with_walls()
+        self.x += self.vx * self.game.dt
+        self.x += self.vy * self.game.dt
+
+        self.rect.x = self.x
+        self.collide_with_walls('x')
+
+        self.rect.y = self.y
+        self.collide_with_walls('y')
 
 # added Mob - moving objects
 # it is a child class of Sprite
