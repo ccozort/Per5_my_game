@@ -8,28 +8,28 @@ from sprites import *
 
 # create a game class that carries all the properties of the game and methods
 class Game:
-  def init(self):
-    pass
+  # initializes all the things we need to run the game...includes the game clock which can set the FPS
   def __init__(self):
     pg.init()
+    # sound mixer...
+    pg.mixer.init()
     self.clock = pg.time.Clock()
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     pg.display.set_caption("Chris' Coolest Game Ever...")
     self.playing = True
   # this is where the game creates the stuff you see and hear
   def new(self):
-    # create sprite group using the pg library
+    # create the all sprites group to allow for batch updates and draw methods
     self.all_sprites = pg.sprite.Group()
     self.all_walls = pg.sprite.Group()
     # instantiating the class to create the player object 
-    self.player = Player(self, 50, 50)
+    self.player = Player(self, 5, 5)
     self.mob = Mob(self, 100, 100)
     self.wall = Wall(self, WIDTH//2, HEIGHT//2)
-
-    for i in range(6):
-      w = Wall(self, TILESIZE*i, TILESIZE*i)
-      print(w.rect.x)
-      m = Mob(self, TILESIZE*i, TILESIZE*i)
+    # instantiates wall and mob objects
+    for i in range(12):
+      Wall(self, TILESIZE*i, HEIGHT/2)
+      Mob(self, TILESIZE*i, TILESIZE*i)
 
 # this is a method
 # methods are like functions that are part of a class
@@ -56,8 +56,6 @@ class Game:
     # update all the sprites...and I MEAN ALL OF THEM
     self.all_sprites.update()
 
- 
-
   # output
   def draw(self):
     self.screen.fill((0, 0, 0))
@@ -65,7 +63,10 @@ class Game:
     pg.display.flip()
 
 if __name__ == "__main__":
-  # instantiate 
+  # instantiate
+  print("main is running...")
   g = Game()
+  print("main is running...")
   g.new()
   g.run()
+  
