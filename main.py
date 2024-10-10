@@ -1,12 +1,27 @@
 # this file was created by: Chris Cozort
-
+# github test
 # this is where we import libraries and modules
 import pygame as pg
 from settings import *
-from sprites import *
+# from sprites import *
+from sprites_side_scroller import *
 from tilemap import *
 from os import path
 # we are editing this file after installing git
+
+'''
+Elevator pitch: I want to create a game that follows an apprentice mage from the bottom of a tower to the top, leveling up as he climbs to the top to defeat the evil wizard...
+
+GOALS: to ascend the tower
+RULES: jump, cast spells, shields attack, cannot move up until puzzles and enemies defeated 
+FEEDBACK: Damage meter, spells interactions 
+FREEDOM: x and y movement with jump, platforming
+
+What's the sentence: Shoot iceblock with fireball melt iceblock to advance...
+
+Alpha goal: to create a sidescroller setup gravity, platform collision, jump
+
+'''
 
 # create a game class that carries all the properties of the game and methods
 class Game:
@@ -90,8 +105,8 @@ class Game:
   def draw(self):
     self.screen.fill(BLACK)
     self.all_sprites.draw(self.screen)
-    self.draw_text(self.screen, "asdfdasfasdf", 24, WHITE, WIDTH/2, HEIGHT/2)
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+    self.draw_text(self.screen, str(self.player.coin_count), 24, WHITE, WIDTH-100, 50)
     pg.display.flip()
 
 if __name__ == "__main__":
