@@ -3,6 +3,7 @@
 # this is where we import libraries and modules
 import pygame as pg
 from settings import *
+from utils import *
 # from sprites import *
 from sprites_side_scroller import *
 from tilemap import *
@@ -38,9 +39,39 @@ class Game:
   def load_data(self):
     self.game_folder = path.dirname(__file__)
     self.map = Map(path.join(self.game_folder, 'level1.txt'))
+  def load_level(self, level):
+    self.map = Map(path.join(self.game_folder, level))
+    # create game countdown timer
+    self.game_timer = Timer(self)
+    # set countdown amount
+    self.game_timer.cd = 45
+    # create the all sprites group to allow for batch updates and draw methods
+    self.all_sprites = pg.sprite.Group()
+    self.all_walls = pg.sprite.Group()
+    self.all_powerups = pg.sprite.Group()
+    self.all_coins = pg.sprite.Group()
+    for row, tiles in enumerate(self.map.data):
+      print(row*TILESIZE)
+      for col, tile in enumerate(tiles):
+        print(col*TILESIZE)
+        if tile == '1':
+          Wall(self, col, row)
+        if tile == 'M':
+          Mob(self, col, row)
+        if tile == 'P':
+          self.player = Player(self, col, row)
+        if tile == 'U':
+          Powerup(self, col, row)
+        if tile == 'C':
+          Coin(self, col, row)
   def new(self):
     self.load_data()
-    print(self.map.data)
+
+    # create game countdown timer
+    self.game_timer = Timer(self)
+    # set countdown amount
+    self.game_timer.cd = 45
+
     # create the all sprites group to allow for batch updates and draw methods
     self.all_sprites = pg.sprite.Group()
     self.all_walls = pg.sprite.Group()
@@ -91,7 +122,16 @@ class Game:
   # process
   # this is where the game updates the game state
   def update(self):
+
+    self.game_timer.ticking()
+    if self.game_timer.cd < 40:
+      for s in self.all_sprites:
+        s.kill()
+      self.load_level("level2.txt")
     # update all the sprites...and I MEAN ALL OF THEM
+    for w in self.all_walls:
+      if self.player.pos.x > WIDTH - WIDTH/3:
+        w.rect.x -= self.player.vel.x
     self.all_sprites.update()
   def draw_text(self, surface, text, size, color, x, y):
     font_name = pg.font.match_font('arial')
@@ -106,14 +146,13 @@ class Game:
     self.screen.fill(BLACK)
     self.all_sprites.draw(self.screen)
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+    self.draw_text(self.screen, str(self.game_timer.get_countdown()), 24, WHITE, WIDTH/30, HEIGHT/16)
     self.draw_text(self.screen, str(self.player.coin_count), 24, WHITE, WIDTH-100, 50)
     pg.display.flip()
 
 if __name__ == "__main__":
   # instantiate
-  print("main is running...")
   g = Game()
-  print("main is running...")
   g.new()
   g.run()
   
