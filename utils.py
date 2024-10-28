@@ -16,7 +16,7 @@ class Timer():
             self.countdown()
     # resets event time to zero - cooldown reset
     def get_countdown(self):
-        print(self.cd)
+        # print(self.cd)
         return floor(self.cd)
     def countdown(self):
         if self.cd > 0:

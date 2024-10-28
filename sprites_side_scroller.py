@@ -27,10 +27,10 @@ class Player(Sprite):
         self.pos = vec(x*TILESIZE, y*TILESIZE)
         self.vel = vec(0,0)
         self.acc = vec(0,0)
-        self.speed = 5
+        self.speed = 3
         # self.vx, self.vy = 0, 0
         self.coin_count = 0
-        self.jump_power = 20
+        self.jump_power = 15
         self.jumping = False
     def get_keys(self):
         keys = pg.key.get_pressed()
@@ -93,6 +93,8 @@ class Player(Sprite):
             if str(hits[0].__class__.__name__) == "Coin":
                 print("I got a coin!!!")
                 self.coin_count += 1
+            if str(hits[0].__class__.__name__) == "Portal":
+                self.game.load_level("level2.txt")
 
     def update(self):
         self.acc = vec(0, GRAVITY)
@@ -131,16 +133,34 @@ class Mob(Sprite):
         self.speed = 25
 
     def update(self):
-        self.rect.x += self.speed
-        # self.rect.y += self.speed
-        if self.rect.x > WIDTH or self.rect.x < 0:
-            self.speed *= -1
-            self.rect.y += 32
-        if self.rect.y > HEIGHT:
-            self.rect.y = 0
+        pass
+        # self.rect.x += self.speed
+        # # self.rect.y += self.speed
+        # if self.rect.x > WIDTH or self.rect.x < 0:
+        #     self.speed *= -1
+        #     self.rect.y += 32
+        # if self.rect.y > HEIGHT:
+        #     self.rect.y = 0
 
-        if self.rect.colliderect(self.game.player):
+        # if self.rect.colliderect(self.game.player):
+        #     self.speed *= -1
+class Barrel(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_barrels
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((32, 32))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.speed = 25
+
+    def update(self):
+        self.rect.x += self.speed
+        if self.rect.x > WIDTH-64 or self.rect.x < 64:
             self.speed *= -1
+            self.rect.y += 64
 
 class Wall(Sprite):
     def __init__(self, game, x, y):
@@ -152,6 +172,19 @@ class Wall(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+class Moving_Platform(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_wallsa
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(BLUE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    def update(self):
+        self.rect.x += 1
+
 
 
 class Powerup(Sprite):
@@ -176,7 +209,16 @@ class Coin(Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-
+class Portal(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_portals
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(ORANGE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
             
   
 
