@@ -92,6 +92,7 @@ class Player(Sprite):
 
         self.rect.y = self.y
         self.collide_with_walls('y')
+        
         # teleport the player to the other side of the screen
         self.collide_with_stuff(self.game.all_powerups, True)
         self.collide_with_stuff(self.game.all_coins, True)

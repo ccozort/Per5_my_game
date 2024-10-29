@@ -48,9 +48,10 @@ class Player(Sprite):
         print("im trying to jump")
         print(self.vel.y)
         self.rect.y += 2
-        hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        whits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        phits = pg.sprite.spritecollide(self, self.game.all_walls, False)
         self.rect.y -= 2
-        if hits and not self.jumping:
+        if whits or phits and not self.jumping:
             self.jumping = True
             self.vel.y = -self.jump_power
             print('still trying to jump...')
@@ -154,7 +155,7 @@ class Barrel(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-        self.speed = 25
+        self.speed = 15
 
     def update(self):
         self.rect.x += self.speed
@@ -172,9 +173,10 @@ class Wall(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+
 class Moving_Platform(Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.all_wallsa
+        self.groups = game.all_sprites, game.all_walls
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))

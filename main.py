@@ -61,8 +61,8 @@ class Game:
           Powerup(self, col, row)
         if tile == 'C':
           Coin(self, col, row)
-        if tile == 'B':
-          Barrel(self, col, row)
+        # if tile == 'B':
+        #   Barrel(self, col, row)
   def new(self):
     self.load_data()
 
@@ -103,10 +103,10 @@ class Game:
           Coin(self, col, row)
         if tile == 'T':
           Portal(self, col, row)
-        if tile == 'L':
-          Moving_Platform(self, col, row)
-        if tile == 'B':
-          Barrel(self, col, row)
+        # if tile == 'L':
+        #   Moving_Platform(self, col, row)
+        # if tile == 'B':
+        #   Barrel(self, col, row)
          
 
 # this is a method
