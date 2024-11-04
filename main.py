@@ -9,6 +9,7 @@ from sprites_side_scroller import *
 from tilemap import *
 from os import path
 # we are editing this file after installing git
+# git test
 
 '''
 Elevator pitch: I want to create a game that follows an apprentice mage from the bottom of a tower to the top, leveling up as he climbs to the top to defeat the evil wizard...
@@ -21,6 +22,15 @@ FREEDOM: x and y movement with jump, platforming
 What's the sentence: Shoot iceblock with fireball melt iceblock to advance...
 
 Alpha goal: to create a sidescroller setup gravity, platform collision, jump
+
+'''
+
+'''
+Sources:
+https://www.pygame.org/docs/ref/mouse.html - used to see if mouse is clicked
+
+Prompt for ChatGPT:
+
 
 '''
 
@@ -38,6 +48,8 @@ class Game:
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
+    self.img_folder = path.join(self.game_folder, 'images')
+    self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
     self.map = Map(path.join(self.game_folder, 'dk_level1.txt'))
   def load_level(self, level):
     # kill all sprites to free up memory
@@ -79,6 +91,9 @@ class Game:
     self.all_platforms = pg.sprite.Group()
     self.all_portals = pg.sprite.Group()
     self.all_barrels = pg.sprite.Group()
+    self.all_mobs = pg.sprite.Group()
+    self.all_projectiles = pg.sprite.Group()
+    self.all_explosions = pg.sprite.Group()
     # instantiating the class to create the player object 
     # self.player = Player(self, 5, 5)
     # self.mob = Mob(self, 100, 100)
@@ -103,6 +118,8 @@ class Game:
           Coin(self, col, row)
         if tile == 'T':
           Portal(self, col, row)
+        if tile == 'R':
+          Projectile(self, col, row)
         # if tile == 'L':
         #   Moving_Platform(self, col, row)
         # if tile == 'B':
@@ -152,7 +169,7 @@ class Game:
 
   # output
   def draw(self):
-    self.screen.fill(BLACK)
+    self.screen.fill(WHITE)
     self.all_sprites.draw(self.screen)
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
     self.draw_text(self.screen, str(self.game_timer.get_countdown()), 24, WHITE, WIDTH/30, HEIGHT/16)
