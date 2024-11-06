@@ -9,6 +9,7 @@ FRICTION = -0.12
 
 # colors
 BLACK = (0,0,0)
+BROWN = (153,76,0)
 WHITE = (255,255,255)
 PINK = (255,155,155)
 RED = (255,0,0)

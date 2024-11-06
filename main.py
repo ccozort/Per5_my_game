@@ -55,14 +55,14 @@ class Game:
     # kill all sprites to free up memory
     for s in self.all_sprites:
        s.kill()
-       print(len(self.all_sprites))
+      #  print(len(self.all_sprites))
     # From load data to create new map object with level parameter
     self.map = Map(path.join(self.game_folder, level))
 
     for row, tiles in enumerate(self.map.data):
-      print(row*TILESIZE)
+      # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
-        print(col*TILESIZE)
+        # print(col*TILESIZE)
         if tile == '1':
           Wall(self, col, row)
         if tile == 'M':
@@ -73,8 +73,8 @@ class Game:
           Powerup(self, col, row)
         if tile == 'C':
           Coin(self, col, row)
-        # if tile == 'B':
-        #   Barrel(self, col, row)
+        if tile == 'B':
+          Barrel(self, col, row)
   def new(self):
     self.load_data()
 
@@ -103,9 +103,9 @@ class Game:
     #   Wall(self, TILESIZE*i, HEIGHT/2)
     #   Mob(self, TILESIZE*i, TILESIZE*i)
     for row, tiles in enumerate(self.map.data):
-      print(row*TILESIZE)
+      # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
-        print(col*TILESIZE)
+        # print(col*TILESIZE)
         if tile == '1':
           Wall(self, col, row)
         if tile == 'M':
@@ -122,8 +122,8 @@ class Game:
           Projectile(self, col, row)
         # if tile == 'L':
         #   Moving_Platform(self, col, row)
-        # if tile == 'B':
-        #   Barrel(self, col, row)
+        if tile == 'B':
+          Barrel(self, col, row)
          
 
 # this is a method
