@@ -28,14 +28,18 @@ class Player(Sprite):
         self.acc = vec(0,0)
         self.speed = 3
         self.coin_count = 0
-        self.jump_power = 15
+        self.jump_power = 10
         self.jumping = False
+        self.climbing = False
         self.cd = Cooldown()
         self.mouse_pos = (0,0)
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_e]:
             self.shoot()
+        if keys[pg.K_w]:
+            if self.climbing:
+                self.vel.y -= 1
         if keys[pg.K_a]:
             self.vel.x -= self.speed
         if keys[pg.K_d]:
@@ -94,18 +98,23 @@ class Player(Sprite):
         #         print("not working...for hits")
         # # else:
         #     print("not working for dir check")
+    def collide_with_ladders(self):
+        self.rect.y -= 16
+        hits = pg.sprite.spritecollide(self, self.game.all_ladders, False)
+        self.rect.y += 16
+        if hits:
+            self.climbing = True
+            self.acc = (0,0)
+        else:
+            self.climbing = False
     def collide_with_stuff(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
             if str(hits[0].__class__.__name__) == "Powerup":
-                # print("i collide with powerup")
                 for m in self.game.all_mobs:
-                    # print("trying to increase mob speed")
                     m.speed = 20
                     print(m.speed)
-                # print("I've gotten a powerup!")
             if str(hits[0].__class__.__name__) == "Coin":
-                # print("I got a coin!!!")
                 self.coin_count += 1
             if str(hits[0].__class__.__name__) == "Portal":
                 self.game.load_level("level2.txt")
@@ -115,7 +124,7 @@ class Player(Sprite):
                     hits[0].kill()
                 else:
                     print("ouch I was hurt!!!")
-
+            
     def update(self):
         self.cd.ticking()
         self.acc = vec(0, GRAVITY)
@@ -135,10 +144,13 @@ class Player(Sprite):
 
         self.rect.y = self.pos.y
         self.collide_with_walls('y')
+
+        self.collide_with_ladders()
         # teleport the player to the other side of the screen
         self.collide_with_stuff(self.game.all_powerups, True)
         self.collide_with_stuff(self.game.all_coins, True)
         self.collide_with_stuff(self.game.all_mobs, False)
+        self.collide_with_stuff(self.game.all_ladders, False)
 
 # added Mob - moving objects
 # it is a child class of Sprite
@@ -317,4 +329,28 @@ class Explosion(pg.sprite.Sprite):
         else:
             self.kill()  # Remove explosion when animation is done  
 
+class Ladder(Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self.groups = game.all_sprites, game.all_ladders
+        Sprite.__init__(self, self.groups)
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.game.ladder_img
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        # self.image.fill(YELLOW)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
 
+class DK(Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self.groups = game.all_sprites
+        Sprite.__init__(self, self.groups)
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.game.dk_img
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        # self.image.fill(YELLOW)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE

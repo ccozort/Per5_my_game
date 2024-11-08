@@ -50,6 +50,8 @@ class Game:
     self.game_folder = path.dirname(__file__)
     self.img_folder = path.join(self.game_folder, 'images')
     self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
+    self.ladder_img = pg.image.load(path.join(self.img_folder, 'ladder.png'))
+    self.dk_img = pg.image.load(path.join(self.img_folder, 'DK.png'))
     self.map = Map(path.join(self.game_folder, 'dk_level1.txt'))
   def load_level(self, level):
     # kill all sprites to free up memory
@@ -59,30 +61,13 @@ class Game:
     # From load data to create new map object with level parameter
     self.map = Map(path.join(self.game_folder, level))
 
-    for row, tiles in enumerate(self.map.data):
-      # print(row*TILESIZE)
-      for col, tile in enumerate(tiles):
-        # print(col*TILESIZE)
-        if tile == '1':
-          Wall(self, col, row)
-        if tile == 'M':
-          Mob(self, col, row)
-        if tile == 'P':
-          self.player = Player(self, col, row)
-        if tile == 'U':
-          Powerup(self, col, row)
-        if tile == 'C':
-          Coin(self, col, row)
-        if tile == 'B':
-          Barrel(self, col, row)
+
   def new(self):
     self.load_data()
-
     # create game countdown timer
     self.game_timer = Timer(self)
     # set countdown amount
     self.game_timer.cd = 45
-
     # create the all sprites group to allow for batch updates and draw methods
     self.all_sprites = pg.sprite.Group()
     self.all_walls = pg.sprite.Group()
@@ -94,6 +79,7 @@ class Game:
     self.all_mobs = pg.sprite.Group()
     self.all_projectiles = pg.sprite.Group()
     self.all_explosions = pg.sprite.Group()
+    self.all_ladders = pg.sprite.Group()
     # instantiating the class to create the player object 
     # self.player = Player(self, 5, 5)
     # self.mob = Mob(self, 100, 100)
@@ -110,8 +96,6 @@ class Game:
           Wall(self, col, row)
         if tile == 'M':
           Mob(self, col, row)
-        if tile == 'P':
-          self.player = Player(self, col, row)
         if tile == 'U':
           Powerup(self, col, row)
         if tile == 'C':
@@ -120,10 +104,19 @@ class Game:
           Portal(self, col, row)
         if tile == 'R':
           Projectile(self, col, row)
-        # if tile == 'L':
-        #   Moving_Platform(self, col, row)
+        if tile == 'V':
+          Moving_Platform(self, col, row)
+        if tile == 'L':
+          Ladder(self, col, row)
         if tile == 'B':
           Barrel(self, col, row)
+    for row, tiles in enumerate(self.map.data):
+      # print(row*TILESIZE)
+      for col, tile in enumerate(tiles):
+        if tile == 'P':
+          self.player = Player(self, col, row)
+        if tile == 'D':
+          self.player = DK(self, col, row)
          
 
 # this is a method
