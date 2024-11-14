@@ -46,11 +46,14 @@ class Game:
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     pg.display.set_caption("Chris' Coolest Game Ever...")
     self.playing = True
+    self.running = True
+    self.score = 0
+    self.highscore = 0
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
     self.img_folder = path.join(self.game_folder, 'images')
-    self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
+    # self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
     self.ladder_img = pg.image.load(path.join(self.img_folder, 'ladder.png'))
     self.dk_img = pg.image.load(path.join(self.img_folder, 'DK.png'))
     self.map = Map(path.join(self.game_folder, 'dk_level1.txt'))
@@ -61,6 +64,37 @@ class Game:
       #  print(len(self.all_sprites))
     # From load data to create new map object with level parameter
     self.map = Map(path.join(self.game_folder, level))
+    for row, tiles in enumerate(self.map.data):
+      # print(row*TILESIZE)
+      for col, tile in enumerate(tiles):
+        # print(col*TILESIZE)
+        if tile == '1':
+          Wall(self, col, row)
+        if tile == 'M':
+          Mob(self, col, row)
+        if tile == 'U':
+          Powerup(self, col, row)
+        if tile == 'C':
+          Coin(self, col, row)
+        if tile == 'T':
+          Portal(self, col, row)
+        if tile == 'R':
+          Projectile(self, col, row)
+        if tile == 'V':
+          Moving_Platform(self, col, row)
+        if tile == 'L':
+          Ladder(self, col, row)
+        if tile == 'A':
+          Lava(self, col, row)
+        if tile == 'B':
+          Barrel(self, col, row)
+    for row, tiles in enumerate(self.map.data):
+      # print(row*TILESIZE)
+      for col, tile in enumerate(tiles):
+        if tile == 'P':
+          self.player = Player(self, col, row)
+        if tile == 'D':
+          self.player = DK(self, col, row)
 
 
   def new(self):
@@ -81,6 +115,7 @@ class Game:
     self.all_projectiles = pg.sprite.Group()
     self.all_explosions = pg.sprite.Group()
     self.all_ladders = pg.sprite.Group()
+    self.all_lava = pg.sprite.Group()
     # instantiating the class to create the player object 
     # self.player = Player(self, 5, 5)
     # self.mob = Mob(self, 100, 100)
@@ -109,8 +144,11 @@ class Game:
           Moving_Platform(self, col, row)
         if tile == 'L':
           Ladder(self, col, row)
+        if tile == 'A':
+          Lava(self, col, row)
         if tile == 'B':
           Barrel(self, col, row)
+    
     for row, tiles in enumerate(self.map.data):
       # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
@@ -118,6 +156,9 @@ class Game:
           self.player = Player(self, col, row)
         if tile == 'D':
           self.player = DK(self, col, row)
+    for i in range(10):
+      p = Powerup(self, randint(0, WIDTH//TILESIZE), randint(0, HEIGHT//TILESIZE))
+      print(p.rect.x)
          
 
 # this is a method
@@ -138,12 +179,17 @@ class Game:
   def events(self):
     for event in pg.event.get():
         if event.type == pg.QUIT:
-          self.playing = False
+          if self.playing:
+            self.playing = False
+          self.running = False
   # process
   # this is where the game updates the game state
   def update(self):
 
     self.game_timer.ticking()
+
+    # if self.player.health < 95:
+    #   self.playing = False
     # if self.game_timer.cd < 40:
     #   for s in self.all_sprites:
     #     s.kill()
@@ -165,14 +211,49 @@ class Game:
   def draw(self):
     self.screen.fill(WHITE)
     self.all_sprites.draw(self.screen)
+    self.draw_text(self.screen, str(self.player.health), 24, BLACK, WIDTH/2, HEIGHT/2)
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
     self.draw_text(self.screen, str(self.game_timer.get_countdown()), 24, WHITE, WIDTH/30, HEIGHT/16)
-    self.draw_text(self.screen, str(self.player.coin_count), 24, WHITE, WIDTH-100, 50)
+    self.draw_text(self.screen, str(self.player.coins), 24, WHITE, WIDTH-100, 50)
     pg.display.flip()
+
+  def show_go_screen(self):
+        # game over/continue
+        if not self.running:
+            return
+        # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
+        # pg.mixer.music.play(loops=-1)
+        self.screen.fill(BLACK)
+        self.draw_text(self.screen, "GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT / 4)
+        self.draw_text(self.screen, "Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
+        self.draw_text(self.screen, "Press a key to play again", 22, WHITE, WIDTH / 2, HEIGHT * 3 / 4)
+        if self.score > self.highscore:
+            self.highscore = self.score
+            self.draw_text(self.screen, "NEW HIGH SCORE!", 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
+            # with open(path.join(self.dir, HS_FILE), 'w') as f:
+            #     f.write(str(self.score))
+        else:
+            self.draw_text(self.screen, "High Score: " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
+        pg.display.flip()
+        self.wait_for_key()
+
+
+  def wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pg.KEYUP:
+                    waiting = False
 
 if __name__ == "__main__":
   # instantiate
   g = Game()
-  g.new()
-  g.run()
+  g.show_go_screen()
+  while g.playing:
+    g.new()
+    g.run()
   

@@ -4,6 +4,27 @@ import pygame as pg
 from pygame.sprite import Sprite
 from settings import *
 from random import randint
+from os import path
+
+
+SPRITESHEET = 'bell.png'
+
+dir = path.dirname(__file__)
+img_dir = path.join(dir, "images")
+
+# sets up file with multiple images...
+class Spritesheet:
+    # utility class for loading and parsing spritesheets
+    def __init__(self, filename):
+        self.spritesheet = pg.image.load(filename).convert()
+
+    def get_image(self, x, y, width, height):
+        # grab an image out of a larger spritesheet
+        image = pg.Surface((width, height))
+        image.blit(self.spritesheet, (0, 0), (x, y, width, height))
+        # image = pg.transform.scale(image, (width, height))
+        image = pg.transform.scale(image, (width * 4, height * 4))
+        return image
 
 # create the player class with a superclass of Sprite
 class Player(Sprite):
@@ -13,7 +34,9 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((32, 32))
+        self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
+        self.load_images()
+        self.image = self.standing_image
         self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect()
         # self.rect.x = x
@@ -23,6 +46,8 @@ class Player(Sprite):
         self.speed = 20
         self.vx, self.vy = 0, 0
         self.coin_count = 0
+    def load_images(self):
+        self.standing_image = self.spritesheet.get_image(0,0,32,32)
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:

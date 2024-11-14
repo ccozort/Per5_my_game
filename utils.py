@@ -35,6 +35,4 @@ class Cooldown():
     def ticking(self):
         self.current_time = floor((pg.time.get_ticks())/1000)
         self.delta = self.current_time - self.event_time
-        # print(self.delta)
-    def timer(self):
-        self.current_time = floor((pg.time.get_ticks())/1000)
+
