@@ -176,6 +176,7 @@ class Wall(Sprite):
         self.rect.y = y * TILESIZE
 
 
+
 class Powerup(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_powerups

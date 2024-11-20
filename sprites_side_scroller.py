@@ -46,8 +46,8 @@ class Player(Sprite):
         self.pos = vec(x*TILESIZE, y*TILESIZE)
         self.vel = vec(0,0)
         self.acc = vec(0,0)
-        self.speed = 3
-        self.jump_power = 10
+        self.speed = 5
+        self.jump_power = 15
         self.jumping = False
         self.climbing = False
         self.cd = Cooldown()
@@ -64,6 +64,8 @@ class Player(Sprite):
         if keys[pg.K_w]:
             if self.climbing:
                 self.vel.y -= 1
+        if keys[pg.K_a]:
+            self.vel.x -= self.speed
         if keys[pg.K_a]:
             self.vel.x -= self.speed
         if keys[pg.K_d]:
@@ -147,11 +149,14 @@ class Player(Sprite):
             if str(hits[0].__class__.__name__) == "Coin":
                 self.coins += 1
             if str(hits[0].__class__.__name__) == "Lava":
-                self.invulnerable.event_time = floor(pg.time.get_ticks()/1000)
-                if self.invulnerable.delta > .01:
-                    self.health -= 1
+                self.health -= 1
+                print(self.health)
+                # self.invulnerable.event_time = floor(pg.time.get_ticks()/1000)
+                # if self.invulnerable.delta > .01:
+                #     self.health -= 1
             if str(hits[0].__class__.__name__) == "Portal":
-                return True
+                # self.game.load_level("level" + str(self.game.currentLevel + 1) ".txt")
+                self.game.load_level("level1.txt")
             if str(hits[0].__class__.__name__) == "Mob":
                 self.invulnerable.event_time = floor(pg.time.get_ticks()/1000)
                 if self.invulnerable.delta > .01:
@@ -190,8 +195,7 @@ class Player(Sprite):
         self.collide_with_stuff(self.game.all_mobs, False)
         self.collide_with_stuff(self.game.all_ladders, False)
         self.collide_with_stuff(self.game.all_lava, False)
-        if self.collide_with_stuff(self.game.all_portals, False) and self.coins > 1:
-            self.game.load_level('level2.txt')
+      
 
 class Mob(Sprite):
     def __init__(self, game, x, y):
@@ -205,17 +209,15 @@ class Mob(Sprite):
         self.rect.y = y * TILESIZE
         self.speed = 5
 
-    # def update(self):
-    #     self.rect.x += self.speed
-    #     # self.rect.y += self.speed
-    #     if self.rect.x > WIDTH or self.rect.x < 0:
-    #         self.speed *= -1
-    #         # self.rect.y += 32
-    #     if self.rect.y > HEIGHT:
-    #         self.rect.y = 0
+    def update(self):
+        self.rect.x += self.speed
+        # self.rect.y += self.speed
+        if self.rect.x > WIDTH or self.rect.x < 0:
+            self.speed *= -1
+            # self.rect.y += 32
+        if self.rect.y > HEIGHT:
+            self.rect.y = 0
 
-    #     if self.rect.colliderect(self.game.player):
-    #         self.speed *= -1
 class Barrel(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_barrels
@@ -354,13 +356,16 @@ class Ladder(Sprite):
         self.game = game
         self.groups = game.all_sprites, game.all_ladders
         Sprite.__init__(self, self.groups)
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.game.ladder_img
-        self.image.set_colorkey(WHITE)
+        self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
+        self.load_images()
+        self.image = self.standing_image
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         # self.image.fill(YELLOW)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+    def load_images(self):
+        self.standing_image = self.spritesheet.get_image(64,0,32,32, 1)
 class DK(Sprite):
     def __init__(self, game, x, y):
         self.game = game

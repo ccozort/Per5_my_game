@@ -12,6 +12,10 @@ from os import path
 # git test
 # git test
 
+
+
+# currentLevel = "level" + str(currentLevel + 1) + ".txt"
+
 '''
 Elevator pitch: I want to create a game that follows an apprentice mage from the bottom of a tower to the top, leveling up as he climbs to the top to defeat the evil wizard...
 
@@ -35,6 +39,8 @@ Prompt for ChatGPT:
 
 '''
 
+
+
 # create a game class that carries all the properties of the game and methods
 class Game:
   # initializes all the things we need to run the game...includes the game clock which can set the FPS
@@ -49,6 +55,10 @@ class Game:
     self.running = True
     self.score = 0
     self.highscore = 0
+    self.key_pressed = False
+    self.key_start = 0
+    self.key_elapsed = 0
+    self.currentLevel = 1
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
@@ -56,7 +66,7 @@ class Game:
     # self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
     self.ladder_img = pg.image.load(path.join(self.img_folder, 'ladder.png'))
     self.dk_img = pg.image.load(path.join(self.img_folder, 'DK.png'))
-    self.map = Map(path.join(self.game_folder, 'dk_level1.txt'))
+    self.map = Map(path.join(self.game_folder, "level" + str(self.currentLevel) + ".txt"))
   def load_level(self, level):
     # kill all sprites to free up memory
     for s in self.all_sprites:
@@ -94,8 +104,7 @@ class Game:
         if tile == 'P':
           self.player = Player(self, col, row)
         if tile == 'D':
-          self.player = DK(self, col, row)
-
+          self.dk = DK(self, col, row)
 
   def new(self):
     self.load_data()
@@ -182,12 +191,34 @@ class Game:
           if self.playing:
             self.playing = False
           self.running = False
+        
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_s:
+            if not self.key_pressed:
+              self.player.jump()
+              self.key_start = pg.time.get_ticks()
+              self.key_pressed = True
+        
+        if event.type == pg.KEYUP:
+          if event.key == pg.K_s:
+            self.key_pressed = False
+            if self.key_elapsed < 300:
+              self.player.vel.y += GRAVITY
+            
+            print("Spacebar held for", self.key_elapsed, "milliseconds")
+        
+        
+
+        
+
   # process
   # this is where the game updates the game state
   def update(self):
 
     self.game_timer.ticking()
-
+    self.key_elapsed = pg.time.get_ticks() - self.key_start
+    if self.key_elapsed > 300:
+      print("max jump factor reached...")
     # if self.player.health < 95:
     #   self.playing = False
     # if self.game_timer.cd < 40:
@@ -248,6 +279,8 @@ class Game:
                     self.running = False
                 if event.type == pg.KEYUP:
                     waiting = False
+
+
 
 if __name__ == "__main__":
   # instantiate
