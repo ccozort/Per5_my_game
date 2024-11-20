@@ -67,13 +67,14 @@ class Game:
     self.ladder_img = pg.image.load(path.join(self.img_folder, 'ladder.png'))
     self.dk_img = pg.image.load(path.join(self.img_folder, 'DK.png'))
     self.map = Map(path.join(self.game_folder, "level" + str(self.currentLevel) + ".txt"))
-  def load_level(self, level):
+  def load_next_level(self):
     # kill all sprites to free up memory
+    self.currentLevel += 1
     for s in self.all_sprites:
        s.kill()
       #  print(len(self.all_sprites))
     # From load data to create new map object with level parameter
-    self.map = Map(path.join(self.game_folder, level))
+    self.map = Map(path.join(self.game_folder, "level" + str(self.currentLevel) + ".txt"))
     for row, tiles in enumerate(self.map.data):
       # print(row*TILESIZE)
       for col, tile in enumerate(tiles):

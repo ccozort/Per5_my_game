@@ -136,7 +136,6 @@ class Player(Sprite):
         self.rect.y += 16
         if hits:
             self.climbing = True
-            self.acc = (0,0)
         else:
             self.climbing = False
     def collide_with_stuff(self, group, kill):
@@ -156,7 +155,7 @@ class Player(Sprite):
                 #     self.health -= 1
             if str(hits[0].__class__.__name__) == "Portal":
                 # self.game.load_level("level" + str(self.game.currentLevel + 1) ".txt")
-                self.game.load_level("level1.txt")
+                self.game.load_next_level()
             if str(hits[0].__class__.__name__) == "Mob":
                 self.invulnerable.event_time = floor(pg.time.get_ticks()/1000)
                 if self.invulnerable.delta > .01:
@@ -170,7 +169,14 @@ class Player(Sprite):
     def update(self):
         self.cd.ticking()
         self.invulnerable.ticking()
-        self.acc = vec(0, GRAVITY)
+        if not self.climbing:
+            self.acc = vec(0, GRAVITY)
+        else:
+            self.acc = vec(0,0)
+            self.acc.y += self.vel.y * FRICTION
+            if abs(self.vel.y) < 0.5:
+                self.vel.y = 0
+
         self.get_keys()
         # self.x += self.vx * self.game.dt
         # self.y += self.vy * self.game.dt
@@ -195,6 +201,7 @@ class Player(Sprite):
         self.collide_with_stuff(self.game.all_mobs, False)
         self.collide_with_stuff(self.game.all_ladders, False)
         self.collide_with_stuff(self.game.all_lava, False)
+        self.collide_with_stuff(self.game.all_portals, False)
       
 
 class Mob(Sprite):
