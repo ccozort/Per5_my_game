@@ -1,4 +1,5 @@
 # this file was created by: Chris Cozort
+# This game engine content was derived from Chris Bradfields content
 # github test
 # this is where we import libraries and modules
 import pygame as pg
@@ -6,6 +7,7 @@ from settings import *
 from utils import *
 # from sprites import *
 from sprites_side_scroller import *
+# from sprites_top_and_side import *
 from tilemap import *
 from os import path
 # we are editing this file after installing git
@@ -39,6 +41,17 @@ Prompt for ChatGPT:
 
 '''
 
+def draw_stat_bar(surf, x, y, w, h, pct, fill_color, outline_color):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = w
+    BAR_HEIGHT = h
+    fill = (pct / 100) * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    pg.draw.rect(surf, BLACK, outline_rect)
+    pg.draw.rect(surf, fill_color, fill_rect)
+    pg.draw.rect(surf, outline_color, outline_rect, 2)
 
 
 # create a game class that carries all the properties of the game and methods
@@ -59,6 +72,7 @@ class Game:
     self.key_start = 0
     self.key_elapsed = 0
     self.currentLevel = 1
+    self.game_mode = "topdown"
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
@@ -194,7 +208,7 @@ class Game:
           self.running = False
         
         if event.type == pg.KEYDOWN:
-          if event.key == pg.K_s:
+          if event.key == pg.K_SPACE:
             if not self.key_pressed:
               self.player.jump()
               self.key_start = pg.time.get_ticks()
@@ -247,6 +261,7 @@ class Game:
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
     self.draw_text(self.screen, str(self.game_timer.get_countdown()), 24, WHITE, WIDTH/30, HEIGHT/16)
     self.draw_text(self.screen, str(self.player.coins), 24, WHITE, WIDTH-100, 50)
+    draw_stat_bar(self.screen, self.player.rect.x, self.player.rect.y-TILESIZE, TILESIZE, 25, self.player.health, RED, WHITE)
     pg.display.flip()
 
   def show_go_screen(self):

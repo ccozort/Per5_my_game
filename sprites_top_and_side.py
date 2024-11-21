@@ -64,12 +64,11 @@ class Player(Sprite):
         if keys[pg.K_e]:
             self.shoot()
         if keys[pg.K_w]:
-            if self.climbing:
-                self.vel.y -= 1
+            self.vel.y -= self.speed
         if keys[pg.K_a]:
             self.vel.x -= self.speed
-        if keys[pg.K_a]:
-            self.vel.x -= self.speed
+        if keys[pg.K_s]:
+            self.vel.y += self.speed
         if keys[pg.K_d]:
             self.vel.x += self.speed
         if keys[pg.K_SPACE]:
@@ -158,6 +157,7 @@ class Player(Sprite):
             if str(hits[0].__class__.__name__) == "Portal":
                 # self.game.load_level("level" + str(self.game.currentLevel + 1) ".txt")
                 self.game.load_next_level()
+                # self.game.game_mode = "sidescroller"
             if str(hits[0].__class__.__name__) == "Mob":
                 self.invulnerable.event_time = floor(pg.time.get_ticks()/1000)
                 if self.invulnerable.delta > .01:
@@ -171,22 +171,24 @@ class Player(Sprite):
     def update(self):
         self.cd.ticking()
         self.invulnerable.ticking()
-        if not self.climbing:
-            self.acc = vec(0, GRAVITY)
+        if self.game.game_mode == "topdown":
+            self.acc = vec(0, 0)
         else:
-            self.acc = vec(0,0)
-            self.acc.y += self.vel.y * FRICTION
-            if abs(self.vel.y) < 0.5:
-                self.vel.y = 0
+            self.acc = vec(0, GRAVITY)
 
         self.get_keys()
         # self.x += self.vx * self.game.dt
         # self.y += self.vy * self.game.dt
         self.acc.x += self.vel.x * FRICTION
+        if self.game.game_mode == "top_down":
+            self.acc.y += self.vel.y * FRICTION
         self.vel += self.acc
 
         if abs(self.vel.x) < 0.1:
             self.vel.x = 0
+        if self.game.game_mode == "top_down":
+            if abs(self.vel.y) < 0.1:
+                self.vel.y = 0
 
         self.pos += self.vel + 0.5 * self.acc
 
