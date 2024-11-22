@@ -6,10 +6,12 @@ import pygame as pg
 from settings import *
 from utils import *
 # from sprites import *
-from sprites_side_scroller import *
+from sprites_vert_scroller import *
+# from sprites_side_scroller import *
 # from sprites_top_and_side import *
 from tilemap import *
 from os import path
+import random
 # we are editing this file after installing git
 # git test
 # git test
@@ -71,15 +73,24 @@ class Game:
     self.key_pressed = False
     self.key_start = 0
     self.key_elapsed = 0
-    self.currentLevel = 1
+    self.currentLevel = 0
     self.game_mode = "topdown"
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
     self.img_folder = path.join(self.game_folder, 'images')
+    self.snd_folder = path.join(self.game_folder, 'sounds')
     # self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
+    # load images
     self.ladder_img = pg.image.load(path.join(self.img_folder, 'ladder.png'))
     self.dk_img = pg.image.load(path.join(self.img_folder, 'DK.png'))
+
+    # load sounds
+    self.jump_snd = pg.mixer.Sound(path.join(self.snd_folder, 'jump_07.wav'))
+    pg.mixer.music.load(path.join(self.snd_folder, 'background_music.mp3'))
+    pg.mixer.music.set_volume(0.4)
+    pg.mixer.music.play(loops=-1)
+
     self.map = Map(path.join(self.game_folder, "level" + str(self.currentLevel) + ".txt"))
   def load_next_level(self):
     # kill all sprites to free up memory
@@ -113,6 +124,8 @@ class Game:
           Lava(self, col, row)
         if tile == 'B':
           Barrel(self, col, row)
+        if tile == 'p':
+          Platform(self, col, row, 100, 20)
     for row, tiles in enumerate(self.map.data):
       # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
@@ -172,7 +185,8 @@ class Game:
           Lava(self, col, row)
         if tile == 'B':
           Barrel(self, col, row)
-    
+        if tile == 'p':
+          Platform(self, col, row, 100, TILESIZE)
     for row, tiles in enumerate(self.map.data):
       # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
@@ -180,9 +194,6 @@ class Game:
           self.player = Player(self, col, row)
         if tile == 'D':
           self.player = DK(self, col, row)
-    for i in range(10):
-      p = Powerup(self, randint(0, WIDTH//TILESIZE), randint(0, HEIGHT//TILESIZE))
-      print(p.rect.x)
          
 
 # this is a method
@@ -233,19 +244,36 @@ class Game:
     self.game_timer.ticking()
     self.key_elapsed = pg.time.get_ticks() - self.key_start
     if self.key_elapsed > 300:
-      print("max jump factor reached...")
-    # if self.player.health < 95:
-    #   self.playing = False
-    # if self.game_timer.cd < 40:
-    #   for s in self.all_sprites:
-    #     s.kill()
-    #   self.load_level("level2.txt")
-    # update all the sprites...and I MEAN ALL OF THEM
-    # for w in self.all_walls:
-    #   if self.player.pos.x > WIDTH - WIDTH/3:
-    #     w.rect.x -= self.player.vel.x
+      pass
+      # print("max jump factor reached...")
     self.all_sprites.update()
-  def draw_text(self, surface, text, size, color, x, y):
+    while len(self.all_platforms) < 15:
+      width = random.randrange(50, 100)
+      p = Platform(self, random.randrange(0, WIDTH//TILESIZE - width//TILESIZE), random.randrange(-5, 0), width, TILESIZE)
+      if random.randint(0,9) > 4:
+        c = Coin(self, p.rect.x//TILESIZE, p.rect.y//TILESIZE - 1)
+        self.all_coins.add(c)
+        self.all_sprites.add(c)
+      self.all_platforms.add(p)
+      self.all_sprites.add(p)
+      
+    if self.player.rect.top <= HEIGHT/4:
+      print(str(len(self.all_platforms)))
+      self.player.pos.y += abs(self.player.vel.y)
+      for plat in self.all_platforms:
+        plat.rect.y += abs(self.player.vel.y)
+        if plat.rect.y >= HEIGHT:
+          
+          plat.kill()
+          print(str(len(self.all_coins)))
+      for coin in self.all_coins:
+        coin.rect.y += abs(self.player.vel.y)
+        if coin.rect.y >= HEIGHT:
+          coin.kill()
+          print(str(len(self.all_coins)))
+     
+    
+  def draw_text(self, surface, text, size, color, x, y): 
     font_name = pg.font.match_font('arial')
     font = pg.font.Font(font_name, size)
     text_surface = font.render(text, True, color)

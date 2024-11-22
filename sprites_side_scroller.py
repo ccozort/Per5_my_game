@@ -93,12 +93,14 @@ class Player(Sprite):
 
     def jump(self):
         # print("im trying to jump")
+        
         print(self.vel.y)
         self.rect.y += 2
         whits = pg.sprite.spritecollide(self, self.game.all_walls, False)
         phits = pg.sprite.spritecollide(self, self.game.all_walls, False)
         self.rect.y -= 2
         if whits or phits and not self.jumping:
+            self.game.jump_snd.play()
             self.jumping = True
             self.vel.y = -self.jump_power
             # print('still trying to jump...')
