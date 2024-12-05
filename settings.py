@@ -18,5 +18,7 @@ BLUE = (0,0,255)
 GOLD = (255,215,0)
 ORANGE = (255,140,0)
 
+HS_FILE = "highscore.txt"
+
 
 

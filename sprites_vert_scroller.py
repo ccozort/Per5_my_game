@@ -176,7 +176,7 @@ class Player(Sprite):
                     m.speed = 20
                     print(m.speed)
             if str(hits[0].__class__.__name__) == "Coin":
-                self.coins += 1
+                self.game.score +=1
             if str(hits[0].__class__.__name__) == "Lava":
                 self.health -= 1
                 print(self.health)

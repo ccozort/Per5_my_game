@@ -55,7 +55,6 @@ def draw_stat_bar(surf, x, y, w, h, pct, fill_color, outline_color):
     pg.draw.rect(surf, fill_color, fill_rect)
     pg.draw.rect(surf, outline_color, outline_rect, 2)
 
-
 # create a game class that carries all the properties of the game and methods
 class Game:
   # initializes all the things we need to run the game...includes the game clock which can set the FPS
@@ -69,7 +68,6 @@ class Game:
     self.playing = True
     self.running = True
     self.score = 0
-    self.highscore = 0
     self.key_pressed = False
     self.key_start = 0
     self.key_elapsed = 0
@@ -78,6 +76,19 @@ class Game:
   # this is where the game creates the stuff you see and hear
   def load_data(self):
     self.game_folder = path.dirname(__file__)
+    # load high score file
+    # From chat GPT - prompt: with open create file in python
+    # if path.exists(HS_FILE):
+    #   print("this exists...")
+    #   with open(path.join(self.game_folder, HS_FILE), 'r') as f:
+    #         self.highscore = int(f.read())
+    # else:
+    #   with open(path.join(self.game_folder, HS_FILE), 'w') as f:
+    #           f.write(str(0))
+    #   print("File created and written successfully.")
+    
+    
+
     self.img_folder = path.join(self.game_folder, 'images')
     self.snd_folder = path.join(self.game_folder, 'sounds')
     # self.player_img = pg.image.load(path.join(self.img_folder, 'bell.png'))
@@ -214,6 +225,10 @@ class Game:
   def events(self):
     for event in pg.event.get():
         if event.type == pg.QUIT:
+          if self.score > self.highscore:
+            self.highscore = self.score
+            with open(path.join(self.game_folder, HS_FILE), 'w') as f:
+              f.write(str(self.score))
           if self.playing:
             self.playing = False
           self.running = False
@@ -288,27 +303,29 @@ class Game:
     self.draw_text(self.screen, str(self.player.health), 24, BLACK, WIDTH/2, HEIGHT/2)
     self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
     self.draw_text(self.screen, str(self.game_timer.get_countdown()), 24, WHITE, WIDTH/30, HEIGHT/16)
-    self.draw_text(self.screen, str(self.player.coins), 24, WHITE, WIDTH-100, 50)
+    self.draw_text(self.screen, str(self.score), 24, BLACK, WIDTH-100, 50)
     draw_stat_bar(self.screen, self.player.rect.x, self.player.rect.y-TILESIZE, TILESIZE, 25, self.player.health, RED, WHITE)
     pg.display.flip()
 
   def show_go_screen(self):
         # game over/continue
+        self.game_folder = path.dirname(__file__)
+
         if not self.running:
             return
-        # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
-        # pg.mixer.music.play(loops=-1)
+        
+        if path.exists(HS_FILE):
+          print("this exists...")
+          with open(path.join(self.game_folder, HS_FILE), 'r') as f:
+                self.highscore = int(f.read())
+        else:
+          with open(path.join(self.game_folder, HS_FILE), 'w') as f:
+                  f.write(str(0))
+        print("File created and written successfully.")
         self.screen.fill(BLACK)
         self.draw_text(self.screen, "GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT / 4)
-        self.draw_text(self.screen, "Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
+        self.draw_text(self.screen, "High Score: " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT / 2)
         self.draw_text(self.screen, "Press a key to play again", 22, WHITE, WIDTH / 2, HEIGHT * 3 / 4)
-        if self.score > self.highscore:
-            self.highscore = self.score
-            self.draw_text(self.screen, "NEW HIGH SCORE!", 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
-            # with open(path.join(self.dir, HS_FILE), 'w') as f:
-            #     f.write(str(self.score))
-        else:
-            self.draw_text(self.screen, "High Score: " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
         pg.display.flip()
         self.wait_for_key()
 
@@ -323,8 +340,6 @@ class Game:
                     self.running = False
                 if event.type == pg.KEYUP:
                     waiting = False
-
-
 
 if __name__ == "__main__":
   # instantiate
