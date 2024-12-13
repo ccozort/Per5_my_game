@@ -75,7 +75,7 @@ class Player(Sprite):
         if keys[pg.K_SPACE]:
             self.jump()
         if pg.mouse.get_pressed()[0]:
-            
+            self.game.game_timer.event_time = 0
             self.shoot()
     def shoot(self):
         self.cd.event_time = floor(pg.time.get_ticks()/1000)
@@ -430,4 +430,3 @@ class Platform(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-        print("i have created a platform...")

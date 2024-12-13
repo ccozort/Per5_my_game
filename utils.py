@@ -8,19 +8,28 @@ class Timer():
         self.current_time = 0
         self.event_time = 0
         self.cd = 0
+        self.cu = 0
+        self.delta = 0
         # ticking ensures the timer is counting...
     # must use ticking to count up or down
     def ticking(self):
         self.current_time = floor((pg.time.get_ticks())/1000)
+        self.delta = self.current_time + self.event_time
+        self.countup()
         if self.cd > 0:
             self.countdown()
+        
     # resets event time to zero - cooldown reset
     def get_countdown(self):
         # print(self.cd)
         return floor(self.cd)
     def countdown(self):
-        if self.cd > 0:
-            self.cd = self.cd - self.game.dt
+        self.cd = self.cd - self.game.dt
+    def get_countup(self):
+        # print(self.cd)
+        return floor(self.cu)
+    def countup(self):
+        self.cu = self.cu + self.delta
     # def event_reset(self):
     #     self.event_time = floor((self.game.clock.)/1000)
     # sets current time
