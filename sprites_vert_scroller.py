@@ -412,13 +412,14 @@ class DK(Sprite):
         self.game = game
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.game.dk_img
-        self.image.set_colorkey(BLACK)
+        self.image = pg.Surface((TILESIZE*2, TILESIZE*2))
+        # self.image = self.game.dk_img
+        # self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        # self.image.fill(YELLOW)
+        self.image.fill(BROWN)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        print("I created donkey kong")
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h):

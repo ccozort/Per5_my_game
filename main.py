@@ -81,8 +81,9 @@ class Game:
     print("data has been loaded")
     try:
       self.game_folder = path.dirname(__file__)
+      print("successfully setup game folder...")
     except:
-       print("unable to load data...")
+       print("unable to setup game folder...")
     self.check_highscore()
     self.img_folder = path.join(self.game_folder, 'images')
     self.snd_folder = path.join(self.game_folder, 'sounds')
@@ -105,7 +106,7 @@ class Game:
       #  print(len(self.all_sprites))
     # From load data to create new map object with level parameter
     # self.map = Map(path.join(self.game_folder, "level" + str(self.currentLevel) + ".txt"))
-    self.map = Map(path.join(self.game_folder, "level0.txt"))
+    self.map = Map(path.join(self.game_folder, "level1.txt"))
     for row, tiles in enumerate(self.map.data):
       # print(row*TILESIZE)
       for col, tile in enumerate(tiles):
@@ -147,7 +148,7 @@ class Game:
                 self.best_time = int(f.read())
         else:
           with open(path.join(self.game_folder, HS_FILE), 'w') as f:
-                self.best_time =  100000
+                self.best_time =  1000000
                 f.write(str(100000))
         print("File created and written successfully.")
   def new(self):
@@ -224,9 +225,20 @@ class Game:
     pg.quit()
   # input
   def events(self):
+    keys = pg.key.get_pressed()
+    if keys[pg.K_r] and keys[pg.K_ESCAPE]:
+    # if keys[pg.K_r] and keys[pg.K_ESCAPE]:
+        print("control")
+        if self.playing:
+            self.playing = False
+        self.running = False
     for event in pg.event.get():
         if event.type == pg.QUIT:
+          print(self.game_timer.current_time)
           if self.game_timer.current_time < self.best_time:
+            print("i got a best time")
+            print(self.game_timer.current_time)
+            print(self.best_time)
             self.best_time = self.game_timer.current_time
             with open(path.join(self.game_folder, HS_FILE), 'w') as f:
               f.write(str(self.game_timer.current_time))
@@ -339,4 +351,3 @@ if __name__ == "__main__":
     g.new()
     g.run()
   g.show_end_screen()
-  
